@@ -1,2 +1,5 @@
 telefones.json
 venv/
+bases/processed/
+telefones.db
+migrate_db.py
