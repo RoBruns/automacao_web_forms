@@ -147,13 +147,16 @@ make_login(email, password)
 
 for file in os.listdir(BASES_PATH):
     file_path = get_file_path(BASES_PATH)
-    file_name = file.rstrip(".csv")
-    telefone = get_phone_number(file_name)
-    if telefone:
-        select_shipping()
-        make_jobs(telefone, file_path, PROCESSED_PATH)
+    file_name, file_extension = os.path.splitext(file)
+    if file_extension == '.csv':
+        telefone = get_phone_number(file_name)
+        if telefone:
+            select_shipping()
+            make_jobs(telefone, file_path, PROCESSED_PATH)
+        else:
+            print("No phone number found for", file_name)
     else:
-        print("No phone number found for", file_name)
+        print("Skipping non-csv file:", file)
 
     time.sleep(0.5)
 
