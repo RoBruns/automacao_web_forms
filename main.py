@@ -135,7 +135,7 @@ def make_jobs(telefone, file, processed_path):
 def get_phone_number(nome):
     conn = sqlite3.connect('telefones.db')
     cursor = conn.cursor()
-    cursor.execute('SELECT telefone FROM contatos WHERE nome = ?', (nome,))
+    cursor.execute('SELECT numero FROM telefones WHERE nome = ?', (nome,))
     result = cursor.fetchone()
     conn.close()
     return result[0] if result else None
