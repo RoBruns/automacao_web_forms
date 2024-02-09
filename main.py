@@ -1,6 +1,6 @@
-import json
 import os
 import shutil
+import sqlite3
 import time
 
 from selenium import webdriver
@@ -81,7 +81,7 @@ def move_processed_file(file_path, processed_path):
 
 
 def get_phrase(file):
-    with open("frases.txt", "r") as f:
+    with open(file, "r") as f:
         sms_text, whatsapp_text = f.readline().strip().split(',')
     return sms_text, whatsapp_text
 
@@ -132,30 +132,34 @@ def make_jobs(telefone, file, processed_path):
     move_processed_file(file, processed_path)
 
 
-def read_json(path):
-    with open(path, "r") as f:
-        return json.load(f)
+def get_phone_number(nome):
+    conn = sqlite3.connect('telefones.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT telefone FROM contatos WHERE nome = ?', (nome,))
+    result = cursor.fetchone()
+    conn.close()
+    return result[0] if result else None
 
-
-data = read_json(JSON_PATH)
 
 email, password = get_login_info(LOGIN_PATH)
 print(email, password)
 make_login(email, password)
 
+
 for file in os.listdir(BASES_PATH):
     file_path = get_file_path(BASES_PATH)
-    file_name = file.rstrip(".csv")
-    for item in data["phones"]:
-        if file_name in item:
+    file_name, file_extension = os.path.splitext(file)
+    if file_extension == '.csv':
+        telefone = get_phone_number(file_name)
+        if telefone:
             select_shipping()
-            print(f"Making jobs for {file_name}: {item[file_name]}")
-            make_jobs(item[file_name], file_path, PROCESSED_PATH)
-            time.sleep(1.5)
-            break
+            make_jobs(telefone, file_path, PROCESSED_PATH)
         else:
-            print(f"No phone found for this file {file_name}")
-            continue
+            print("No phone number found for", file_name)
+    else:
+        print("Skipping non-csv file:", file)
+
+    time.sleep(0.5)
 
 time.sleep(0.5)
 driver.quit()

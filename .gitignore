@@ -1,3 +1,8 @@
 telefones.json
 venv/
 bases/processed/
+<<<<<<< HEAD
+=======
+telefones.db
+migrate_db.py
+>>>>>>> 60bcd0f1ef67d904dfe340474ba69e291efe6311
